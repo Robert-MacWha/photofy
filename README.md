@@ -1,1 +1,1 @@
-# photofy
+# PhotoFy
