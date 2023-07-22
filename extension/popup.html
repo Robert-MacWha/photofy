@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Image Trustworthiness Indicator</title>
     <style>
@@ -11,40 +12,55 @@
             align-items: center;
             justify-content: center;
         }
+
         .indicator {
             display: flex;
             align-items: center;
             margin: 10px 0;
         }
+
         .indicator div {
             width: 20px;
             height: 20px;
             margin-right: 10px;
         }
+
         .red {
             background-color: red;
         }
+
         .green {
             background-color: green;
         }
+
         .amber {
             background-color: rgba(255, 191, 0, 1);
         }
+
+        .grey {
+            background-color: #808080;
+        }
     </style>
 </head>
+
 <body>
     <h1>Image Trustworthiness Indicator</h1>
     <div class="indicator">
         <div class="red"></div>
-        <p>Red: The image is untrustworthy.</p>
+        <p>The image is untrustworthy.</p>
     </div>
     <div class="indicator">
-      <div class="amber"></div>
-      <p>Amber: The trustworthiness of the image is uncertain.</p>
-  </div>
+        <div class="amber"></div>
+        <p>The trustworthiness of the image is uncertain.</p>
+    </div>
     <div class="indicator">
         <div class="green"></div>
-        <p>Green: The image is trustworthy.</p>
+        <p>The image is trustworthy.</p>
+    </div>
+    <div class="indicator">
+        <div class="grey"></div>
+        <p>Unknown image</p>
     </div>
 </body>
+
 </html>
