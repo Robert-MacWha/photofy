@@ -26,7 +26,7 @@ start_hardhat_node() {
 run_deploy_script() {
   echo "Running backend/deploy.py script..."
   cd backend
-  C:/Users/trebo/Documents/GitHub/PhotoFy/.conda/python deploy.py
+  python deploy.py
 }
 
 # Main script execution
@@ -35,7 +35,7 @@ kill_existing_hardhat_node # Kill any existing processes of npx hardhat node
 start_hardhat_node # Start npx hardhat node in the background
 
 # Wait for a few seconds to ensure that the hardhat node is up and running
-sleep 5
+sleep 10
 
 run_deploy_script # Run the backend/deploy.py script
 
