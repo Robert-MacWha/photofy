@@ -141,7 +141,7 @@ def uploadImage():
     global priorSha, imageRaw, private_key, address, contract_address
 
     imageSha = computeSha256(imageRaw)
-    print("sha", imageSha)
+    print("Hash:", imageSha)
 
     w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545/"))
 
@@ -170,7 +170,8 @@ def uploadImage():
     priorSha = imageSha
 
 def computeSha256(img: Image.Image):
-    img_data = img.tobytes()
-    print([str(x) for x in img_data[20000:20100]])
+    print("dim", img.width, img.height)
+    img_data = img.copy().convert("RGB").tobytes()
+    print("Length", len(img_data))
     sha256_hash = hashlib.sha256(img_data).hexdigest()
     return sha256_hash
