@@ -26,8 +26,12 @@ contract ImageRepository {
         images[representation] = Image(msg.sender, previousVersion, representation, modificationSummary);
     }
 
-    function getImage(bytes32 representation) public view returns (Image memory) {
-        return images[representation];
+    function getImage(bytes32 representation) public view returns (address, bytes32, int8) {
+        address a = images[representation].creator;
+        bytes32 b = images[representation].previousVersion;
+        int8 m = images[representation].modificationSummary;
+
+        return (a, b, 10);
     }
 
     function flagUntrustworthy(address user, int score) public onlyAdmin {

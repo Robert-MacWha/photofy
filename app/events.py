@@ -155,7 +155,7 @@ def uploadImage():
     nonce = w3.eth.get_transaction_count(address)
 
     unsigned_tx = storage_sol.functions.uploadImage(
-        priorSha.encode("utf-8")[:32], imageSha.encode("utf-8")[:32], trustScore
+        bytes.fromhex(priorSha), bytes.fromhex(imageSha), trustScore
     ).build_transaction(
         {
             "from": address,
@@ -166,12 +166,14 @@ def uploadImage():
 
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
     w3.eth.wait_for_transaction_receipt(tx_hash)
+    tx_data = w3.eth.get_transaction(tx_hash)
+    print(tx_data)
 
     priorSha = imageSha
 
 def computeSha256(img: Image.Image):
     print("dim", img.width, img.height)
-    img_data = img.copy().convert("RGB").tobytes()
+    img_data = img.copy().convert("RGBA").tobytes()
     print("Length", len(img_data))
     sha256_hash = hashlib.sha256(img_data).hexdigest()
     return sha256_hash

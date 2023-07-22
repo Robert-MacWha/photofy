@@ -3,6 +3,7 @@
     "version": "1.0",
     "manifest_version": 3,
     "permissions": ["activeTab", "scripting"],
+    "host_permissions": ["http://localhost:8545/"],
     "action": {
       "default_popup": "popup.html"
     },

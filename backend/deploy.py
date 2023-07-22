@@ -43,7 +43,7 @@ w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545/"))
 
 load_dotenv()
 private_key = os.getenv("PRIVATE_KEY")
-address = os.getenv("ADDRESS")
+address = w3.to_checksum_address(os.getenv("ADDRESS"))
 
 # initialize contract
 ImageRepository = w3.eth.contract(abi=abi, bytecode=bytecode)

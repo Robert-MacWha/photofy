@@ -1,10 +1,3 @@
-// let provider = new ethers.providers.JsonRpcProvider('http://127.0.01:8545/');
-
-// let abi = ["..."]; 
-// let contractAddress = '...'; 
-
-// Create a contract instance
-//let contract = new ethers.Contract(contractAddress, abi, provider);
 
 window.onload = function () {
   let images = document.getElementsByTagName('img');
@@ -59,12 +52,7 @@ window.onload = function () {
 
         // Call the function and get the SHA-256 hash
         sha256(uint8Array).then(hash => {
-          console.log(uint8Array, hash); // The SHA-256 hash of the image data
-
-          // Call the contract's getImage function
-         // contract.getImage(hash).then((image) => {
-           // console.log(image);
-          //});
+          result = getImage(hash);
         });
 
       })
@@ -77,4 +65,36 @@ async function sha256(buffer) {
   const hashArray = Array.from(new Uint8Array(digestBuffer));
   const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
   return hashHex;
+}
+
+function getImage(representation) {
+  console.log(representation)
+  const data = "0x6ced1ae9" + representation;
+  const contractAddress = "0x850ec3780cedfdb116e38b009d0bf7a1ef1b8b38"
+
+  fetch('http://localhost:8545', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'eth_call',
+      params: [{
+        to: contractAddress,
+        data: data
+      }, 'latest']
+    }),
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(result => {
+      console.log(result.result);
+    })
+    .catch(e => console.log('There was an error: ' + e));
 }
