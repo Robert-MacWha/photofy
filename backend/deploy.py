@@ -39,8 +39,7 @@ abi = json.loads(
     compiled_sol["contracts"]["ImageRepository.sol"]["ImageRepository"]["metadata"]
 )["output"]["abi"]
 
-w3 = Web3(Web3.HTTPProvider("HTTP://127.0.0.1:7545"))
-chain_id = 1337
+w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545/"))
 
 load_dotenv()
 private_key = os.getenv("PRIVATE_KEY")
@@ -51,7 +50,7 @@ ImageRepository = w3.eth.contract(abi=abi, bytecode=bytecode)
 nonce = w3.eth.get_transaction_count(address)
 # set up transaction from constructor which executes when firstly
 transaction = ImageRepository.constructor().build_transaction(
-    {"chainId": chain_id, "from": address, "nonce": nonce}
+    {"from": address, "nonce": nonce}
 )
 signed_tx = w3.eth.account.sign_transaction(transaction, private_key=private_key)
 tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)

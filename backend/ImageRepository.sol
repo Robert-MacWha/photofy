@@ -6,7 +6,7 @@ contract ImageRepository {
         address creator;
         bytes32 previousVersion;
         bytes32 representation;
-        string modificationSummary;
+        int8 modificationSummary;
     }
 
     mapping (address => bool) public admins;
@@ -22,7 +22,7 @@ contract ImageRepository {
         admins[msg.sender] = true;
     }
 
-    function uploadImage(bytes32 previousVersion, bytes32 representation, string memory modificationSummary) public {
+    function uploadImage(bytes32 previousVersion, bytes32 representation, int8 modificationSummary) public {
         images[representation] = Image(msg.sender, previousVersion, representation, modificationSummary);
     }
 
