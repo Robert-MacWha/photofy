@@ -11,25 +11,15 @@ window.onload = function () {
     const backgroundImage = style.getPropertyValue('background-image');
     if (backgroundImage && backgroundImage !== 'none') {
       let url = backgroundImage.slice(4, -1).replace(/['"]/g, '');
+
+      if (!url.startsWith("http"))
+        continue;
+
       url = url.split("=")[0]
+      url += "=w750-h560-s-no"
       handleImage(url);
     }
   }
-
-  // let divs = document.getElementsByTagName('div');
-  // for (let div of divs) {
-  //   const style = window.getComputedStyle(div);
-  //   const backgroundImage = style.getPropertyValue('background-image');
-  //   if (backgroundImage && backgroundImage !== 'none') {
-  //     const href = div.parentElement.getAttribute("href");
-
-  //     if (href == null)
-  //       continue;
-
-  //     const url = "https://photos.google.com" + href.slice(1);
-  //     handleImage(url);
-  //   }
-  // }
 
   // Create a new observer
   let observer = new MutationObserver((mutations) => {
@@ -81,27 +71,12 @@ function handleImage(imageUrl) {
       const uint8Array = new Uint8Array(imageData.data.buffer)
 
       // Call the function and get the SHA-256 hash
-      return sha256(uint8Array).then(hash => getImage(hash));
+      return sha256(uint8Array).then(h => getImage(h));
     })
     .then(result => {
-      console.log("result", result, imageUrl);
-      if (canvas.width > 64 && canvas.height > 64) {
-        const lastBytes = parseInt(result.result.slice(-20), 16); // Last 10 bytes are the last 20 characters
-        let color;
-        if (lastBytes < Number.MAX_SAFE_INTEGER / 3) {
-          color = 'red';
-        } else if (lastBytes < (Number.MAX_SAFE_INTEGER / 3) * 2) {
-          color = 'green';
-        } else {
-          color = 'blue';
-        }
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, 50, 50); // Draw a 50x50 rectangle in the top left corner
-      }
-      const body = document.querySelector('body');
-      body.appendChild(canvas); // Append the canvas to the body
+      console.log(result, imageUrl);
     })
-    .catch(error => console.log(error));
+    .catch(error => console.log(error, imageUrl));
 }
 
 async function sha256(buffer) {

@@ -23,6 +23,7 @@ contract ImageRepository {
     }
 
     function uploadImage(bytes32 previousVersion, bytes32 representation, int8 modificationSummary) public {
+        require(images[representation].creator == address(0));
         images[representation] = Image(msg.sender, previousVersion, representation, modificationSummary);
     }
 
@@ -31,7 +32,7 @@ contract ImageRepository {
         bytes32 b = images[representation].previousVersion;
         int8 m = images[representation].modificationSummary;
 
-        return (a, b, 10);
+        return (a, b, m);
     }
 
     function flagUntrustworthy(address user, int score) public onlyAdmin {
