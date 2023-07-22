@@ -73,6 +73,29 @@ def rotate_image(canvas, width, height):
             title="Rotate Image Error", message="Please select an image to rotate!"
         )
 
+def applyFilter(filter, canvas, width, height):
+    global imageRaw, imageTk
+
+    # apply the filter to the rotated image
+    if filter == "Black and White":
+        imageRaw = ImageOps.grayscale(imageRaw)
+    elif filter == "Blur":
+        imageRaw = imageRaw.filter(ImageFilter.BLUR)
+    elif filter == "Contour":
+        imageRaw = imageRaw.filter(ImageFilter.CONTOUR)
+    elif filter == "Detail":
+        imageRaw = imageRaw.filter(ImageFilter.DETAIL)
+    elif filter == "Emboss":
+        imageRaw = imageRaw.filter(ImageFilter.EMBOSS)
+    elif filter == "Edge Enhance":
+        imageRaw = imageRaw.filter(ImageFilter.EDGE_ENHANCE)
+    elif filter == "Sharpen":
+        imageRaw = imageRaw.filter(ImageFilter.SHARPEN)
+    elif filter == "Smooth":
+        imageRaw = imageRaw.filter(ImageFilter.SMOOTH)        
+
+    showImage(canvas, width, height)
+
 # function for drawing lines on the opened image
 def draw(event, canvas):
     global pen_color, trustScore
@@ -92,8 +115,10 @@ def changeColor():
 def eraseLines(canvas):
     canvas.delete("oval")
 
-def saveImage():
+def saveImage(canvas):
     global imageRaw
+
+    imageRaw = ImageGrab.grab(bbox=(canvas.winfo_rootx(), canvas.winfo_rooty(), canvas.winfo_rootx() + canvas.winfo_width(), canvas.winfo_rooty() + canvas.winfo_height()))
 
     uploadImage()
 
@@ -144,7 +169,7 @@ def uploadImage():
 
     priorSha = imageSha
 
-def computeSha256(img):
+def computeSha256(img: Image.Image):
     img_data = img.tobytes()
     print([str(x) for x in img_data[20000:20100]])
     sha256_hash = hashlib.sha256(img_data).hexdigest()
