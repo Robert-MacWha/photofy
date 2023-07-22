@@ -1,4 +1,4 @@
-# PhotoFy
+# Photofy
 
 Photofy works to combat the issue of false information online, specifically with respect to images. In a time of rising uncertainty as to whether information is real or not, Photofy looks to highlight which images can be trusted and to what degree.
 
