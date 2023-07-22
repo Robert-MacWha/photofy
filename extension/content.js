@@ -1,3 +1,12 @@
+// let provider = new ethers.providers.JsonRpcProvider('http://127.0.01:8545/');
+
+
+// let abi = ["..."]; 
+// let contractAddress = '...'; 
+
+// Create a contract instance
+// let contract = new ethers.Contract(contractAddress, abi, provider);
+
 window.onload = function () {
   // Create a new observer
   let observer = new MutationObserver((mutations) => {
@@ -43,11 +52,16 @@ window.onload = function () {
 
         // Get the pixel data from the canvas
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const uint8Array = new Uint8Array(imageData)
+        const uint8Array = new Uint8Array(imageData.data.buffer)
 
         // Call the function and get the SHA-256 hash
         sha256(uint8Array).then(hash => {
           console.log(uint8Array, hash); // The SHA-256 hash of the image data
+
+          // Call the contract's getImage function
+          contract.getImage(hash).then((image) => {
+            console.log(image);
+          });
         });
 
       })
