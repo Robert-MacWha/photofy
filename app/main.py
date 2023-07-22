@@ -25,6 +25,17 @@ left_frame.pack(side="left", fill="y")
 canvas = ttk.Canvas(root, width=WIDTH, height=HEIGHT)
 canvas.pack()
 
+# label
+filter_label = ttk.Label(left_frame, text="Select Filter:", background="white")
+filter_label.pack(padx=0, pady=2)
+
+# a list of filters
+image_filters = ["Contour", "Black and White", "Blur", "Detail", "Emboss", "Edge Enhance", "Sharpen", "Smooth"]
+
+# combobox for the filters
+filter_combobox = ttk.Combobox(left_frame, values=image_filters, width=15)
+filter_combobox.pack(padx=10, pady=5)
+
 # loading the icons for the 4 buttons
 image_icon = ttk.PhotoImage(file = 'icons/add.png')
 flip_icon = ttk.PhotoImage(file = 'icons/flip.png')
@@ -49,9 +60,10 @@ color_button.pack(pady=5)
 erase_button = ttk.Button(left_frame, image=erase_icon, bootstyle="light", command = lambda : events.eraseLines(canvas))
 erase_button.pack(pady=5)
 # button for saving the image file
-save_button = ttk.Button(left_frame, image=save_icon, bootstyle="light", command=lambda : events.saveImage())
+save_button = ttk.Button(left_frame, image=save_icon, bootstyle="light", command=lambda : events.saveImage(canvas))
 save_button.pack(pady=5)
 
 canvas.bind("<B1-Motion>", lambda e : events.draw(e, canvas))
+filter_combobox.bind("<<ComboboxSelected>>", lambda event: events.applyFilter(filter_combobox.get(), canvas, WIDTH, HEIGHT))
 
 root.mainloop()
