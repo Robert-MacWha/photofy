@@ -25,17 +25,6 @@ left_frame.pack(side="left", fill="y")
 canvas = ttk.Canvas(root, width=WIDTH, height=HEIGHT)
 canvas.pack()
 
-# label
-filter_label = ttk.Label(left_frame, text="Select Filter:", background="white")
-filter_label.pack(padx=0, pady=2)
-
-# a list of filters
-image_filters = ["Contour", "Black and White", "Blur", "Detail", "Emboss", "Edge Enhance", "Sharpen", "Smooth"]
-
-# combobox for the filters
-filter_combobox = ttk.Combobox(left_frame, values=image_filters, width=15)
-filter_combobox.pack(padx=10, pady=5)
-
 # loading the icons for the 4 buttons
 image_icon = ttk.PhotoImage(file = 'icons/add.png')
 flip_icon = ttk.PhotoImage(file = 'icons/flip.png')
@@ -54,13 +43,15 @@ flip_button.pack(pady=5)
 rotate_button = ttk.Button(left_frame, image=rotate_icon, bootstyle="light", command=lambda : events.rotate_image(canvas, WIDTH, HEIGHT))
 rotate_button.pack(pady=5)
 # button for choosing pen color
-color_button = ttk.Button(left_frame, image=color_icon, bootstyle="light")
+color_button = ttk.Button(left_frame, image=color_icon, bootstyle="light", command=lambda : events.changeColor())
 color_button.pack(pady=5)
 # button for erasing the lines drawn over the image file
-erase_button = ttk.Button(left_frame, image=erase_icon, bootstyle="light")
+erase_button = ttk.Button(left_frame, image=erase_icon, bootstyle="light", command = lambda : events.eraseLines(canvas))
 erase_button.pack(pady=5)
 # button for saving the image file
 save_button = ttk.Button(left_frame, image=save_icon, bootstyle="light", command=lambda : events.saveImage())
 save_button.pack(pady=5)
+
+canvas.bind("<B1-Motion>", lambda e : events.draw(e, canvas))
 
 root.mainloop()

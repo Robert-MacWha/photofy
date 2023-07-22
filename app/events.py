@@ -12,10 +12,12 @@ import hashlib
 
 def on_start() -> tuple:
     load_dotenv()
-    global private_key, address, contract_address
+    global private_key, address, contract_address, pen_color
+    
     private_key = os.getenv("PRIVATE_KEY")
     address = os.getenv("ADDRESS")
     contract_address = os.getenv("CONTRACT_ADDRESS")
+    pen_color = "#ffffff"
 
     if private_key == None:
         w3 = Web3()
@@ -71,9 +73,29 @@ def rotate_image(canvas, width, height):
             title="Rotate Image Error", message="Please select an image to rotate!"
         )
 
+# function for drawing lines on the opened image
+def draw(event, canvas):
+    global pen_color, trustScore
+    trustScore = min(trustScore, 100)
+
+    pen_size = 10
+    x1, y1 = (event.x - pen_size), (event.y - pen_size)
+    x2, y2 = (event.x + pen_size), (event.y + pen_size)
+    canvas.create_oval(x1, y1, x2, y2, fill=pen_color, outline="", width=pen_size, tags="oval")
+
+def changeColor():
+    global pen_color
+    pen_color = colorchooser.askcolor(title="Select Pen Color")[1]
+
+    print(pen_color)
+
+def eraseLines(canvas):
+    canvas.delete("oval")
 
 def saveImage():
     global imageRaw
+
+    uploadImage()
 
     file_path = filedialog.asksaveasfilename(defaultextension=".jpg")
     if file_path:
