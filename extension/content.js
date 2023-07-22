@@ -10,13 +10,26 @@ window.onload = function () {
     const style = window.getComputedStyle(div);
     const backgroundImage = style.getPropertyValue('background-image');
     if (backgroundImage && backgroundImage !== 'none') {
-      const href = div.parentElement.getAttribute("href");
-
-      if (href != null) {
-        handleImage("https://photos.google.com" + href.slice(1));
-      }
+      let url = backgroundImage.slice(4, -1).replace(/['"]/g, '');
+      url = url.split("=")[0]
+      handleImage(url);
     }
   }
+
+  // let divs = document.getElementsByTagName('div');
+  // for (let div of divs) {
+  //   const style = window.getComputedStyle(div);
+  //   const backgroundImage = style.getPropertyValue('background-image');
+  //   if (backgroundImage && backgroundImage !== 'none') {
+  //     const href = div.parentElement.getAttribute("href");
+
+  //     if (href == null)
+  //       continue;
+
+  //     const url = "https://photos.google.com" + href.slice(1);
+  //     handleImage(url);
+  //   }
+  // }
 
   // Create a new observer
   let observer = new MutationObserver((mutations) => {
@@ -48,7 +61,6 @@ window.onload = function () {
 }
 
 function handleImage(imageUrl) {
-  console.log(imageUrl);
   fetch(imageUrl)
     .then(response => response.blob())
     .then(blob => createImageBitmap(blob))
@@ -60,8 +72,6 @@ function handleImage(imageUrl) {
       // Set the canvas size to the image size
       canvas.width = imageBitmap.width;
       canvas.height = imageBitmap.height;
-      console.log(imageUrl);
-      console.log(canvas.width, canvas.height, "div");
 
       // Draw the image onto the canvas
       ctx.drawImage(imageBitmap, 0, 0);
@@ -71,12 +81,10 @@ function handleImage(imageUrl) {
       const uint8Array = new Uint8Array(imageData.data.buffer)
 
       // Call the function and get the SHA-256 hash
-      sha256(uint8Array).then(hash => {
-        return getImage(hash);
-      });
-
+      return sha256(uint8Array).then(hash => getImage(hash));
     })
     .then(result => {
+      console.log("result", result, imageUrl);
       if (canvas.width > 64 && canvas.height > 64) {
         const lastBytes = parseInt(result.result.slice(-20), 16); // Last 10 bytes are the last 20 characters
         let color;
@@ -100,15 +108,15 @@ async function sha256(buffer) {
   const digestBuffer = await window.crypto.subtle.digest('SHA-256', buffer);
   const hashArray = Array.from(new Uint8Array(digestBuffer));
   const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+  console.log(hashHex);
   return hashHex;
 }
 
 function getImage(representation) {
-  console.log(representation)
   const data = "0x6ced1ae9" + representation;
   const contractAddress = "0x850ec3780cedfdb116e38b009d0bf7a1ef1b8b38"
 
-  fetch('http://localhost:8545', {
+  return fetch('http://localhost:8545', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -2,8 +2,8 @@
     "name": "Photofy.ai",
     "version": "1.0",
     "manifest_version": 3,
-    "permissions": ["activeTab", "scripting"],
-    "host_permissions": ["http://localhost:8545/"],
+    "permissions": ["activeTab", "scripting", "webRequest"],
+    "host_permissions": ["<all_urls>"],
     "action": {
       "default_popup": "popup.html"
     },
