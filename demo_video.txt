@@ -1,0 +1,4 @@
+Requirements: 
+1. Run the ./deploy.sh file in the context of the ./.conda environment
+2. Make sure google photos is open, and that your downloads directory contains the image we want to modify
+3. 

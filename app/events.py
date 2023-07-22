@@ -49,6 +49,7 @@ def open_image(canvas, width, height):
         priorSha = computeSha256(imageRaw)
 
         showImage(canvas, width, height)
+        uploadImage()
 
 
 def flip_image(canvas, width, height):
