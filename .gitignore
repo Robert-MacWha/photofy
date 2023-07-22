@@ -1,5 +1,4 @@
 node_modules/
 .conda/
 __pycache__/
-.env
 .vscode/
