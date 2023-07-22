@@ -8,6 +8,8 @@ file_path = ""
 pen_size = 3
 pen_color = "black"
 
+events.on_start()
+
 root = ttk.Window(themename="cosmo")
 root.title("Photofy")
 # root.geometry("510x580+300+110")
@@ -58,7 +60,7 @@ color_button.pack(pady=5)
 erase_button = ttk.Button(left_frame, image=erase_icon, bootstyle="light")
 erase_button.pack(pady=5)
 # button for saving the image file
-save_button = ttk.Button(left_frame, image=save_icon, bootstyle="light")
+save_button = ttk.Button(left_frame, image=save_icon, bootstyle="light", command=lambda : events.saveImage())
 save_button.pack(pady=5)
 
 root.mainloop()

@@ -3,6 +3,30 @@ from PIL import Image, ImageOps, ImageTk, ImageFilter, ImageGrab
 from tkinter.messagebox import showerror, askyesno
 from tkinter import colorchooser
 
+import os
+from dotenv import load_dotenv
+from web3 import Web3
+
+def on_start() -> tuple:
+    load_dotenv()
+    private_key = os.getenv("PRIVATE_KEY")
+    address = os.getenv("ADDRESS")
+
+    if private_key == None:
+        w3 = Web3()
+        acc = w3.eth.account.create()
+        aHex = w3.to_hex(acc._private_key)
+
+        private_key = str(aHex)
+        address = acc.address
+
+        with open(".env", "a+") as f:
+            f.write(f"PRIVATE_KEY={private_key}\n")
+            f.write(f"ADDRESS={address}\n")
+
+    print(address)
+    return address, private_key
+
 # function to open the image file
 def open_image(canvas, width, height):
     global imageRaw
@@ -30,6 +54,14 @@ def rotate_image(canvas, width, height):
         
     except:
         showerror(title='Rotate Image Error', message='Please select an image to rotate!')
+
+def saveImage():
+    global imageRaw
+
+    file_path = filedialog.asksaveasfilename(defaultextension=".jpg")
+    if file_path:
+        imageRaw.save(file_path)
+
 
 def showImage(canvas, width, height):
     global imageRaw, imageTk
