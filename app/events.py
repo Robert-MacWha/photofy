@@ -12,12 +12,13 @@ import hashlib
 
 def on_start() -> tuple:
     load_dotenv()
-    global private_key, address, contract_address, pen_color
+    global private_key, address, contract_address, pen_color, priorSha
     
     private_key = os.getenv("PRIVATE_KEY")
     address = os.getenv("ADDRESS")
     contract_address = os.getenv("CONTRACT_ADDRESS")
-    pen_color = "#ffffff"
+    pen_color = "#000000"
+    priorSha = 0
 
     if private_key == None:
         w3 = Web3()
@@ -31,7 +32,6 @@ def on_start() -> tuple:
             f.write(f"PRIVATE_KEY={private_key}\n")
             f.write(f"ADDRESS={address}\n")
 
-    print(address)
     return address, private_key
 
 
@@ -53,29 +53,23 @@ def open_image(canvas, width, height):
 
 
 def flip_image(canvas, width, height):
-    try:
-        global imageRaw
-        imageRaw = imageRaw.transpose(Image.FLIP_LEFT_RIGHT)
-
-        showImage(canvas, width, height)
-    except:
-        showerror(title="Flip Image Error", message="Please select an image to flip!")
+    global imageRaw, trustScore
+    trustScore = max(trustScore, 10)
+    
+    imageRaw = imageRaw.transpose(Image.FLIP_LEFT_RIGHT)
+    showImage(canvas, width, height)
 
 
 def rotate_image(canvas, width, height):
-    try:
-        global imageRaw
+    global imageRaw, trustScore
+    trustScore = max(trustScore, 10)
 
-        imageRaw = imageRaw.rotate(90, expand=True)
-        showImage(canvas, width, height)
-
-    except:
-        showerror(
-            title="Rotate Image Error", message="Please select an image to rotate!"
-        )
+    imageRaw = imageRaw.rotate(90, expand=True)
+    showImage(canvas, width, height)
 
 def applyFilter(filter, canvas, width, height):
-    global imageRaw, imageTk
+    global imageRaw, imageTk, trustScore
+    trustScore = max(trustScore, 15)
 
     # apply the filter to the rotated image
     if filter == "Black and White":
@@ -100,7 +94,7 @@ def applyFilter(filter, canvas, width, height):
 # function for drawing lines on the opened image
 def draw(event, canvas):
     global pen_color, trustScore
-    trustScore = min(trustScore, 100)
+    trustScore = max(trustScore, 100)
 
     pen_size = 10
     x1, y1 = (event.x - pen_size), (event.y - pen_size)
@@ -110,8 +104,6 @@ def draw(event, canvas):
 def changeColor():
     global pen_color
     pen_color = colorchooser.askcolor(title="Select Pen Color")[1]
-
-    print(pen_color)
 
 def eraseLines(canvas):
     canvas.delete("oval")
@@ -142,7 +134,7 @@ def uploadImage():
     global priorSha, imageRaw, private_key, address, contract_address
 
     imageSha = computeSha256(imageRaw)
-    print("Hash:", imageSha)
+    print("Hash:", imageSha, priorSha)
 
     w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545/"))
 
@@ -155,6 +147,7 @@ def uploadImage():
     storage_sol = w3.eth.contract(abi=abi, address=w3.to_checksum_address(contract_address))
     nonce = w3.eth.get_transaction_count(address)
 
+    print("Trust -------------------------------", trustScore)
     unsigned_tx = storage_sol.functions.uploadImage(
         bytes.fromhex(priorSha), bytes.fromhex(imageSha), trustScore
     ).build_transaction(
@@ -167,14 +160,14 @@ def uploadImage():
 
     tx_hash = w3.eth.send_raw_transaction(signed_tx.rawTransaction)
     w3.eth.wait_for_transaction_receipt(tx_hash)
-    tx_data = w3.eth.get_transaction(tx_hash)
-    print(tx_data)
 
     priorSha = imageSha
 
+def uploadWithWorldcoin():
+    # TODO
+    pass
+
 def computeSha256(img: Image.Image):
-    print("dim", img.width, img.height)
     img_data = img.copy().convert("RGBA").tobytes()
-    print("Length", len(img_data))
     sha256_hash = hashlib.sha256(img_data).hexdigest()
     return sha256_hash

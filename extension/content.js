@@ -1,7 +1,7 @@
 window.onload = function () {
   let images = document.getElementsByTagName('img');
   for (let img of images) {
-    handleImage(img.src);
+    handleImage(img, img.src);
   }
 
   // Handle divs with background images
@@ -11,25 +11,15 @@ window.onload = function () {
     const backgroundImage = style.getPropertyValue('background-image');
     if (backgroundImage && backgroundImage !== 'none') {
       let url = backgroundImage.slice(4, -1).replace(/['"]/g, '');
+
+      if (!url.startsWith("http"))
+        continue;
+
       url = url.split("=")[0]
-      handleImage(url);
+      url += "=w750-h560-s-no"
+      handleImage(div, url);
     }
   }
-
-  // let divs = document.getElementsByTagName('div');
-  // for (let div of divs) {
-  //   const style = window.getComputedStyle(div);
-  //   const backgroundImage = style.getPropertyValue('background-image');
-  //   if (backgroundImage && backgroundImage !== 'none') {
-  //     const href = div.parentElement.getAttribute("href");
-
-  //     if (href == null)
-  //       continue;
-
-  //     const url = "https://photos.google.com" + href.slice(1);
-  //     handleImage(url);
-  //   }
-  // }
 
   // Create a new observer
   let observer = new MutationObserver((mutations) => {
@@ -41,13 +31,13 @@ window.onload = function () {
           if (node.nodeType === 1) {
             // Check if the node is an image or a div with a background image
             if (node.tagName === 'IMG') {
-              handleImage(node.src);
+              handleImage(node, node.src);
             } else if (node.tagName === 'DIV') {
               const style = window.getComputedStyle(node);
               const backgroundImage = style.getPropertyValue('background-image');
               if (backgroundImage && backgroundImage !== 'none') {
                 const url = backgroundImage.slice(4, -1).replace(/['"]/g, '');
-                handleImage(url);
+                handleImage(node, url);
               }
             }
           }
@@ -60,13 +50,14 @@ window.onload = function () {
   observer.observe(document, { childList: true, subtree: true });
 }
 
-function handleImage(imageUrl) {
+function handleImage(img, imageUrl) {
+  const canvas = document.createElement('canvas');
+
   fetch(imageUrl)
     .then(response => response.blob())
     .then(blob => createImageBitmap(blob))
     .then(imageBitmap => {
       // Create a canvas
-      const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
 
       // Set the canvas size to the image size
@@ -81,27 +72,32 @@ function handleImage(imageUrl) {
       const uint8Array = new Uint8Array(imageData.data.buffer)
 
       // Call the function and get the SHA-256 hash
-      return sha256(uint8Array).then(hash => getImage(hash));
+      return sha256(uint8Array).then(h => getImage(h));
     })
     .then(result => {
-      console.log("result", result, imageUrl);
-      if (canvas.width > 64 && canvas.height > 64) {
-        const lastBytes = parseInt(result.result.slice(-20), 16); // Last 10 bytes are the last 20 characters
-        let color;
-        if (lastBytes < Number.MAX_SAFE_INTEGER / 3) {
-          color = 'red';
-        } else if (lastBytes < (Number.MAX_SAFE_INTEGER / 3) * 2) {
-          color = 'green';
-        } else {
-          color = 'blue';
+      console.log(result);
+      let color;
+      if (parseInt(result.slice(2)) == 0) {
+        color = 'grey';
+      } else {
+        if (canvas.width > 64 && canvas.height > 64) {
+          const lastBytes = parseInt(result.slice(-20), 16); // Last 10 bytes are the last 20 characters
+          console.log(lastBytes);
+          if (lastBytes > 90) {
+            color = 'red';
+          } else if (lastBytes > 5) {
+            color = 'yellow';
+          } else {
+            color = 'green';
+          }
         }
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, 50, 50); // Draw a 50x50 rectangle in the top left corner
       }
-      const body = document.querySelector('body');
-      body.appendChild(canvas); // Append the canvas to the body
+
+        // blit to screen
+        const indicator = createIndicator(color);
+        img.parentNode.insertBefore(indicator, img.nextSibling);
     })
-    .catch(error => console.log(error));
+    .catch(error => console.log(error, imageUrl));
 }
 
 async function sha256(buffer) {
@@ -141,4 +137,16 @@ function getImage(representation) {
       return result.result;
     })
     .catch(e => console.log('There was an error: ' + e));
+}
+
+function createIndicator(color) {
+  const indicator = document.createElement('div');
+  indicator.style.width = '24px';
+  indicator.style.height = '24px';
+  indicator.style.backgroundColor = color;
+  indicator.style.position = 'absolute';
+  indicator.style.top = '0';
+  indicator.style.left = '0';
+  indicator.style.borderRadius = '0 0 10px 0';
+  return indicator;
 }
